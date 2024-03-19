@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { onObjectFinalized } from "firebase-functions/v2/storage";
 import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
@@ -63,14 +64,22 @@ export const transcribeFile = onObjectFinalized(async (event) => {
 
     const parts = filePath.split("/");
     const fileName = parts[1];
-    const [objectId, category] = fileName.split("-");
-    console.log("objectId:", objectId);
+    // const [objectId, category] = fileName.split("-");
+    const [
+      fileId, chatHistoryId, firebaseUserId, category, date,
+    ] = fileName.split("-");
+    console.log("fileId:", fileId);
+    console.log("chatHistoryId:", chatHistoryId);
+    console.log("firebaseUserId:", firebaseUserId);
     console.log("category:", category);
+    console.log("date:", date);
 
     const docs = await textSplitter.createDocuments(
       [text],
       [{
-        "userId": mongoLangChainClient.createObjectIdFromString(objectId),
+        "fileId": mongoLangChainClient.createObjectIdFromString(fileId),
+        "chatHistoryId": mongoLangChainClient.createObjectIdFromString(chatHistoryId),
+        "firebaseUserId": firebaseUserId,
         "category": category,
       }]
     );
