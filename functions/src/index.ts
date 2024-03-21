@@ -25,7 +25,7 @@ export const transcribeFile = onObjectFinalized(async (event) => {
     const fileBucket = event.data.bucket; // Storage bucket
     const filePath = event.data.name; // File path in the bucket.
     const contentType = event.data.contentType; // File content type.
-
+    const metadata = event.data.metadata;
 
     console.log("fileBucket:", fileBucket);
     console.log("filePath:", filePath);
@@ -33,6 +33,23 @@ export const transcribeFile = onObjectFinalized(async (event) => {
     if (contentType !== "text/plain") {
       return logger.log("This is not a text file.");
     }
+    console.log("metadata:", metadata);
+
+    // if (metadata) {
+    //   // Extract metadata properties
+    //   const fileName = metadata.fileName;
+    //   const postId = metadata.postId;
+    //   const userId = metadata.userId;
+    //   const chatHistoryId = metadata.chatHistoryId;
+    //   const fileId = metadata.fileId;
+
+    //   // Use the extracted metadata properties as needed
+    //   console.log("fileName:", fileName);
+    //   console.log("postId:", postId);
+    //   console.log("userId:", userId);
+    //   console.log("chatHistoryId:", chatHistoryId);
+    //   console.log("fileId:", fileId);
+    // }
 
     // Download file into memory from bucket.
     const bucket = getStorage().bucket(fileBucket);
@@ -66,11 +83,12 @@ export const transcribeFile = onObjectFinalized(async (event) => {
     const fileName = parts[1];
     // const [objectId, category] = fileName.split("-");
     const [
-      fileId, chatHistoryId, firebaseUserId, category, date,
+      fileId, chatHistoryId, firebaseUserId, postId, category, date,
     ] = fileName.split("-");
     console.log("fileId:", fileId);
     console.log("chatHistoryId:", chatHistoryId);
     console.log("firebaseUserId:", firebaseUserId);
+    console.log("postId:", postId);
     console.log("category:", category);
     console.log("date:", date);
 
