@@ -2,13 +2,12 @@
 import { onObjectFinalized } from "firebase-functions/v2/storage";
 import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
-
+import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { createMongoDBConnection } from "./db/mongoLangChain/mongoDbClient";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MongoDBAtlasVectorSearch } from "langchain/vectorstores/mongodb_atlas";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-
 
 initializeApp();
 
@@ -117,6 +116,15 @@ export const transcribeFile = onObjectFinalized(async (event) => {
 
     // const fileContent = textBuffer.toString("utf-8");
     console.log("Text content saved to MongoDB");
+    const transcriptStateToUpdate = "done"; // State to update
+    // Query Firestore to find the post by postId
+    const postRef = getFirestore().collection("Posts").doc(postId);
+    const postSnapshot = await postRef.get();
+    const post = postSnapshot.data();
+    console.log("post found", post);
+    await postRef.set({
+      transcriptState: transcriptStateToUpdate,
+    }, { merge: true });
   } catch (error) {
     console.error("Error in Firebase function:", error);
   } finally {
